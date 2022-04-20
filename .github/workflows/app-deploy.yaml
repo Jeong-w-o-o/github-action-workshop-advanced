@@ -21,3 +21,37 @@ jobs:
       shell: bash
       run: |
         echo $FUNCTION_APP_PATH
+
+    - name: Checkout the repo
+      uses: actions/checkout@v2
+
+    - name: Setup .NET SDK
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: '6.x'
+    - name: Restore NuGet packages
+      shell: bash
+      run: |
+        dotnet restore .
+
+    - name: Build Function App
+      shell: bash
+      run: dotnet build . -c Release
+
+    - name: Test Funtion App
+      shell: bash
+      run: |
+        dotnet test . -c Release
+
+    - name: Create Function App artiface
+      shell: bash
+      run: |
+        pushd "${{ env.FUNCTION_APP_PATH }}"
+        dotnet publish . -c Release -o published
+        popd
+
+    - name: Upload Function App artifact
+      uses: actions/upload-artiface@v2
+      with:
+        name: apiapp
+        path: ${{ env.FUNCTION_APP_PATH }}/published
