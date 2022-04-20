@@ -61,12 +61,12 @@ jobs:
     needs: build-test
 
     runs-on: ubuntu-latest
-
+    
     steps:
-    - name: Set envirionment variables
+    - name: Set environment variables
       shell: bash
       run: |
-        echo "RESOURCE_GROUP_NAME=rg-${{ secrets.RESOURCE_GROUP_NAME }}" >> $GITHUB_ENV
+        echo "RESOURCE_GROUP_NAME=rg-${{ secrets.RESOURCE_NAME }}" >> $GITHUB_ENV
         echo "FUNCTION_APP_PATH=${{ github.workspace }}/published" >> $GITHUB_ENV
         echo "FUNCTION_APP_NAME=fncapp-${{ secrets.RESOURCE_NAME }}" >> $GITHUB_ENV
 
@@ -74,21 +74,20 @@ jobs:
       shell: bash
       run: |
         echo $RESOURCE_GROUP_NAME
-        echo $RESOURCE_GROUP_NAME
-        echo $RESOURCE_GROUP_NAME
-
+        echo $FUNCTION_APP_PATH
+        echo $FUNCTION_APP_NAME
     - name: Download Function App artifact
       uses: actions/download-artifact@v2
       with:
         name: apiapp
         path: ${{ env.FUNCTION_APP_PATH }}
-
+    
     - name: Login to Azure
       uses: Azure/login@v1
       with:
-        cred: ${{ secrets.AZURE_CREDENTIALS }}
-
-    - name: Get Function APpp publish profile
+        creds: ${{ secrets.AZURE_CREDENTIALS }}
+    
+    - name: Get Function App publish profile
       id: publishprofile
       uses: aliencube/publish-profile-actions@v1
       env:
@@ -96,14 +95,14 @@ jobs:
       with:
         resourceGroupName: ${{ env.RESOURCE_GROUP_NAME }}
         appName: ${{ env.FUNCTION_APP_NAME }}
-
+    
     - name: Deploy Function App
-      uese: Azure/functions-action@v1
+      uses: Azure/functions-action@v1
       with:
         app-name: ${{ env.FUNCTION_APP_NAME }}
         package: ${{ env.FUNCTION_APP_PATH }}
         publish-profile: ${{ steps.publishprofile.outputs.profile }}
-
+    
     - name: Reset Function App publish profile
       uses: aliencube/publish-profile-actions@v1
       env:
