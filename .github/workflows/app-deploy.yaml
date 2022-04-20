@@ -15,7 +15,7 @@ jobs:
     - name: Set environment variables
       shell: bash
       run: |
-        ehco "FUNCTION_APP_PATH=${{ github.workspace }}/api" >> $GITHUB_ENV
+        echo "FUNCTION_APP_PATH=${{ github.workspace }}/api" >> $GITHUB_ENV
 
     - name: Check environment vairavles
       shell: bash
